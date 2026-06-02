@@ -418,10 +418,11 @@
         `;
         document.body.appendChild(commentPopup);
 
-        // Add keyboard handler for textarea (Enter to submit, Shift+Enter for newline)
+        // Add keyboard handler for textarea (Enter to submit, Shift+Enter for newline;
+        // ignore Enter while IME composition is active so confirming a conversion does not submit)
         const textarea = document.getElementById('comment-text');
         textarea.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
                 e.preventDefault();
                 const saveBtn = document.getElementById('comment-save');
                 if (saveBtn) {
