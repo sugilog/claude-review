@@ -1,6 +1,6 @@
 ---
 description: Open a Markdown file in the claude-review web interface
-argument-hint: [file]
+argument-hint: [relative-path, e.g. PLAN.md]
 allowed-tools: Bash(claude-review review:*)
 ---
 
