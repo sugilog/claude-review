@@ -432,6 +432,41 @@ func handleDeleteComment(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleResolveAll(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		ProjectDirectory string `json:"project_directory"`
+		FilePath         string `json:"file_path"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if req.ProjectDirectory == "" {
+		http.Error(w, "project_directory is required", http.StatusBadRequest)
+		return
+	}
+	if req.FilePath == "" {
+		http.Error(w, "file_path is required", http.StatusBadRequest)
+		return
+	}
+
+	count, err := resolveComments(req.ProjectDirectory, req.FilePath)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "resolved",
+		"count":  count,
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleResolveThread(w http.ResponseWriter, r *http.Request) {
 	// Extract comment ID from URL path
 	commentIDStr := chi.URLParam(r, "id")

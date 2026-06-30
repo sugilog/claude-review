@@ -137,6 +137,7 @@ func runServer() {
 	r.Post("/api/comments", handleCreateComment)
 	r.Patch("/api/comments/{id}", handleUpdateComment)
 	r.Patch("/api/comments/{id}/resolve", handleResolveThread)
+	r.Post("/api/comments/resolve-all", handleResolveAll)
 	r.Delete("/api/comments/{id}", handleDeleteComment)
 	r.Get("/api/events", handleSSE)
 	r.Post("/api/events", handleBroadcast)

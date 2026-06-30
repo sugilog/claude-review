@@ -164,6 +164,14 @@
                 savePanelState('expanded');
             }
         });
+
+        const resolveAllBtn = commentPanel.querySelector('.comment-resolve-all-btn');
+        if (resolveAllBtn) {
+            resolveAllBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleResolveAll();
+            });
+        }
     }
 
     function savePanelState(state) {
@@ -175,11 +183,16 @@
 
         const listContainer = commentPanel.querySelector('.comment-panel-list');
         const countElement = commentPanel.querySelector('.comment-count');
+        const resolveAllBtn = commentPanel.querySelector('.comment-resolve-all-btn');
 
         // Group comments by thread
         const threads = groupCommentsByThread();
 
         countElement.textContent = threads.length;
+
+        if (resolveAllBtn) {
+            resolveAllBtn.disabled = threads.length === 0;
+        }
 
         // Clear existing list
         listContainer.innerHTML = '';
@@ -585,6 +598,57 @@
         } catch (error) {
             console.error('Failed to save reply:', error);
             alert('Failed to save reply. Please try again.');
+        }
+    }
+
+    async function handleResolveAll() {
+        const threads = groupCommentsByThread();
+        if (threads.length === 0) {
+            return;
+        }
+
+        const message =
+            threads.length === 1
+                ? 'Resolve the 1 open thread in this file?'
+                : `Resolve all ${threads.length} open threads in this file?`;
+        if (!confirm(message)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/comments/resolve-all', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    project_directory: projectDir,
+                    file_path: filePath,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Clear local comment state
+            if (typeof comments !== 'undefined' && comments !== null) {
+                comments.length = 0;
+            }
+
+            // Remove all comment highlights from the document
+            document.querySelectorAll('.comment-highlight').forEach((highlight) => {
+                const parent = highlight.parentNode;
+                while (highlight.firstChild) {
+                    parent.insertBefore(highlight.firstChild, highlight);
+                }
+                parent.removeChild(highlight);
+            });
+
+            updateCommentPanel();
+        } catch (error) {
+            console.error('Failed to resolve all threads:', error);
+            alert('Failed to resolve all threads. Please try again.');
         }
     }
 

@@ -735,3 +735,31 @@ ul.contains-task-list li {
     border-color: #116329;
     color: #116329;
 }
+
+.comment-resolve-all-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border: 1px solid #1a7f37;
+    border-radius: 12px;
+    background-color: #dafbe1;
+    color: #1a7f37;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.comment-resolve-all-btn:hover:not(:disabled) {
+    background-color: #aceebb;
+    border-color: #116329;
+    color: #116329;
+}
+
+.comment-resolve-all-btn:disabled {
+    background-color: #f6f8fa;
+    border-color: #d1d5da;
+    color: #959da5;
+    cursor: not-allowed;
+}
